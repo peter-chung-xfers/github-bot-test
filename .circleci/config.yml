@@ -7,17 +7,6 @@ setup: true
 orbs:
   continuation: circleci/continuation@0.1.2
 
-parameters:
-  setup:
-    type: boolean
-    default: true
-  hello:
-    type: boolean
-    default: false
-  world:
-    type: boolean
-    default: false
-
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
@@ -26,50 +15,15 @@ jobs:
     steps:
       - checkout
       - continuation/continue:
-          configuration_path: .circleci/config.yml
-          parameters: '{"hello":true,"setup":false}'
+          configuration_path: .circleci/continue.yml
+          parameters: '{"hello":true}'
       - continuation/continue:
-          configuration_path: .circleci/config.yml
-          parameters: '{"world":true,"setup":false}'
-
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo 'hello'"
-          
-  say-world:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      - run:
-          name: "Say world"
-          command: "echo 'world' && exit 1"
+          configuration_path: .circleci/continue.yml
+          parameters: '{"world":true}'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   setup-workflow:
-    when: << pipeline.parameters.setup >>
     jobs:
       - setup
-  say-hello-workflow:
-    when: << pipeline.parameters.hello >>
-    jobs:
-      - say-hello
-  say-world-workflow:
-    when: << pipeline.parameters.world >>
-    jobs:
-      - say-world
