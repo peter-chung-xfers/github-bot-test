@@ -5,7 +5,19 @@ version: 2.1
 setup: true
 
 orbs:
-  continuation: circleci/continuation@0.1.2
+  swissknife: roopakv/swissknife@0.69.0
+  continuation: circleci/continuation@0.3.1
+
+parameters:
+  setup:
+    type: boolean
+    default: true
+  hello:
+    type: boolean
+    default: false
+  world:
+    type: boolean
+    default: false
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
@@ -14,16 +26,27 @@ jobs:
     executor: continuation/default
     steps:
       - checkout
-      - continuation/continue:
-          configuration_path: .circleci/continue.yml
-          parameters: '{"hello":true}'
-      - continuation/continue:
-          configuration_path: .circleci/continue.yml
-          parameters: '{"world":true}'
+      - swissknife/trigger-pipeline:
+          custom-parameters: '{"hello":true,"setup":false}'
+      - swissknife/trigger-pipeline:
+          custom-parameters: '{"world":true,"setup":false}'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   setup-workflow:
+    when: << pipeline.parameters.setup-- >>
     jobs:
       - setup
+  hello-workflow:
+    when: << pipeline.parameters.hello-- >>
+    jobs:
+      - continuation/continue:
+          configuration_path: .circleci/continue.yml
+          parameters: '{"hello":true}'
+  world-workflow:
+    when: << pipeline.parameters.world-- >>
+    jobs:
+      - continuation/continue:
+          configuration_path: .circleci/continue.yml
+          parameters: '{"world":true}'
