@@ -43,10 +43,10 @@ workflows:
     jobs:
       - continuation/continue:
           configuration_path: .circleci/continue.yml
-          parameters: '{"hello":true}'
+          parameters: '{"_hello":true}'
   world-workflow:
     when: << pipeline.parameters.world >>
     jobs:
       - continuation/continue:
           configuration_path: .circleci/continue.yml
-          parameters: '{"world":true}'
+          parameters: '{"_world":true}'
